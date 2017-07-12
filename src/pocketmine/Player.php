@@ -2048,10 +2048,10 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 						if(!$this->hasEffect(Effect::JUMP) and $diff > 0.6 and $expectedVelocity < $this->speed->y and !$this->server->getAllowFlight()){
 							if($this->inAirTicks < 100){
 								$this->setMotion(new Vector3(0, $expectedVelocity, 0));
-							}elseif($this->kick("Flying is not enabled on this server")){
+							}/**elseif($this->kick("Flying is not enabled on this server")){
 								$this->timings->stopTiming();
 								return false;
-							}
+							}*/
 						}
 					}
 
@@ -2574,7 +2574,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				//TODO: player abilities, check for other changes
 				$isCheater = ($this->allowFlight === false && ($packet->flags >> 9) & 0x01 === 1) || (!$this->isSpectator() && ($packet->flags >> 7) & 0x01 === 1);
 				if(($packet->isFlying and !$this->allowFlight and !$this->server->getAllowFlight()) or $isCheater){
-					$this->kick("Flying is not enabled on this server"); //TODO: Customizing the message
+					#$this->kick("Flying is not enabled on this server"); //TODO: Customizing the message
 					break;
 				}else{
 					$this->server->getPluginManager()->callEvent($ev = new PlayerToggleFlightEvent($this, $packet->isFlying));
@@ -3684,7 +3684,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				if($this->spawned === false or !$this->isAlive()){
 					break;
 				}
-
+				if(!$this->isOp()) return;
 				$tile = $this->level->getTile($this->temporalVector->setComponents($packet->x, $packet->y, $packet->z));
 				if($tile instanceof ItemFrame){
 					$this->server->getPluginManager()->callEvent($ev = new ItemFrameDropItemEvent($this, $tile->getBlock(), $tile, $tile->getItem()));
