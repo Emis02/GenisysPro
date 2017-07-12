@@ -60,4 +60,5 @@ class TransferServerCommand extends VanillaCommand{
 			return false;
 		}
 	}
+}
 
