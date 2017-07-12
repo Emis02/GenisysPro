@@ -1,0 +1,26 @@
+#Circle-CI
+
+#machine:
+#  php:
+#    version: 7.0.17
+
+checkout:
+ post:
+   - git clone https://github.com/ClearSkyTeam/CI-Test
+   - git submodule sync --recursive
+   - git submodule update --recursive --init
+
+dependencies:
+  pre:
+    - rm /opt/circleci/php/$(phpenv global)/etc/conf.d/xdebug.ini
+    - wget -O PHP7.tar.gz https://dl.bintray.com/pocketmine/PocketMine/PHP_7.0.6_x86-64_Linux.tar.gz --no-check-certificate
+    - tar -xf PHP7.tar.gz
+  override:
+    - sed -i -e s/SELF-COMPILED/$CIRCLE_BUILD_NUM/g src/pocketmine/PocketMine.php;
+    - mkdir plugins
+
+test:
+  override:
+    - . ./CI-Test/Travis.sh $PHP_ENVIROMENT
+    - 'curl -i --verbose -X POST -F chat_id="$CHAT_ID" -F document=@"$(find|grep PocketMine-MP)" -F caption="State: Succeeded\nPhar: #$CIRCLE_BUILD_NUM for branch \"$CIRCLE_BRANCH\" (#@$CIRCLE_TAG)\nChanges: $CIRCLE_COMPARE_URL\nCreated by $CIRCLE_USERNAME\nMore build information here: $CIRCLE_BUILD_URL" -F disable_notification="true" https://api.telegram.org/bot$TG_API/sendDocument'
+    - cp -rv ./plugins/DevTools/ $CIRCLE_ARTIFACTS
